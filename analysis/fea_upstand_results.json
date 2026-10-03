@@ -1,0 +1,12 @@
+{
+ "rev1": {
+  "rev": 1,
+  "compliance_um_per_N": 7.344728825930156,
+  "n_elements": 5664
+ },
+ "rev2": {
+  "rev": 2,
+  "compliance_um_per_N": 0.18468263901447918,
+  "n_elements": 10537
+ }
+}

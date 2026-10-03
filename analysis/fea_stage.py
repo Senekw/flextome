@@ -8,24 +8,28 @@ from skfem.helpers import ddot, sym_grad, trace, eye
 E0 = 3.5e9; NU = 0.36            # PLA
 REF_W = 60.0
 # regions: (x0,x1,z0,z1,width_mm)
-REG = [
-    (130, 192, 30, 36, 90),      # foot (plus column base)
-    (137, 138, 36, 80, 60),      # front flexure plate
-    (180, 181, 36, 80, 40),      # rear plates (2 x 20)
-    (128, 184, 80, 88, 90),      # platform (clearance to upstand at 186)
-    (127.5, 160, 88, 92.5, 84),  # blade holder body
-    (166, 176, 58, 80, 24),      # nut tab
-    (186, 192, 36, 92, 32),      # rear upstand (fixed, carries frame nut)
+REG = [   # rev. 2 geometry (deck at z=22)
+    (130, 196, 22, 28, 90),      # foot
+    (137, 138, 28, 72, 60),      # front flexure plate
+    (180, 181, 28, 72, 40),      # rear plates (2 x 20)
+    (128, 183, 72, 80, 90),      # platform (clearance to the upstand at 184)
+    (127.5, 160, 80, 92.5, 84),  # blade holder body (full-width back wall)
+    (150, 160, 48, 72, 48),      # nut tab (48 wide)
+    (140, 150, 56, 72, 48),      # tab gusset, -x side (triangular; modelled as the inscribed block with half width below)
+    (160, 172, 56, 72, 24),      # tab side gussets, +x side (2 x 12 wide, outside the coupler)
+    (184, 194, 28, 82, 64),      # gusseted upstand (fixed, carries the frame nut)
 ]
 def inside(cx, cz):
     w = np.zeros_like(cx)
     for (x0, x1, z0, z1, wd) in REG:
         m = (cx >= x0) & (cx <= x1) & (cz >= z0) & (cz <= z1)
+        if (x0, x1) == (140, 150): m &= (cz >= 72 - (cx-140)/10*16)          # triangle (140,72)-(150,72)-(150,56)
+        if (x0, x1) == (160, 172): m &= (cz >= 56 + (cx-160)/12*16)          # triangle (160,72)-(172,72)-(160,56)
         w[m] = wd
     return w
 
 def run(h=0.5, F=1.0, load_z=92.5, nut_fixed=True):
-    xs = np.arange(126, 192.0001, h); zs = np.arange(30, 93.0001, h)
+    xs = np.arange(126, 196.0001, h); zs = np.arange(22, 93.0001, h)
     m = MeshTri.init_tensor(xs, zs)
     c = m.p[:, m.t].mean(axis=1)
     w = inside(c[0], c[1])
@@ -43,9 +47,9 @@ def run(h=0.5, F=1.0, load_z=92.5, nut_fixed=True):
         return 2*mu_f(E)*ddot(sym_grad(u), sym_grad(v)) + lam_f(E)*trace(sym_grad(u))*trace(sym_grad(v))
     K = asm(stiff, basis, E=Efield)
     # BCs: foot bottom z=30 fixed (all dofs); nut tab x-dofs fixed (screw holds it) if nut_fixed
-    dofs_fix = basis.get_dofs(lambda x: x[1] < 30 + 1e-6).all()
+    dofs_fix = basis.get_dofs(lambda x: x[1] < 22 + 1e-6).all()
     if nut_fixed:
-        tab = basis.get_dofs(lambda x: (x[0] > 166-1e-6) & (x[0] < 176+1e-6) & (x[1] > 64) & (x[1] < 76))
+        tab = basis.get_dofs(lambda x: (x[0] > 150-1e-6) & (x[0] < 160+1e-6) & (x[1] > 54) & (x[1] < 66))
         dofs_fix = np.unique(np.concatenate([dofs_fix, tab.nodal["u^1"]]))
     # load: F (N) in +x spread over nodes at top-front of holder (x<=129, z >= load_z-0.5)
     ln = basis.get_dofs(lambda x: (x[0] < 129.01) & (x[1] > load_z-0.51)).nodal["u^1"]

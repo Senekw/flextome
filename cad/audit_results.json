@@ -1,0 +1,238 @@
+{
+ "n_parts": 35,
+ "poses": "12 crank angles x 3 screw positions",
+ "unintended": {},
+ "intended": {
+  "frame | pivot_strips_steel": {
+   "max_mm3": 4.0,
+   "phi": 330.0,
+   "theta": -6.2,
+   "screw_dx": 5.0
+  },
+  "pivot_strips_steel | arm": {
+   "max_mm3": 55.8,
+   "phi": 150.0,
+   "theta": 4.3,
+   "screw_dx": -5.0
+  },
+  "conrod | crank_pin": {
+   "max_mm3": 98.2,
+   "phi": 0.0,
+   "theta": 0.0,
+   "screw_dx": -5.0
+  },
+  "handwheel | handle": {
+   "max_mm3": 150.8,
+   "phi": 0.0,
+   "theta": 0.0,
+   "screw_dx": -5.0
+  },
+  "stage_body_flexure | preload_springs": {
+   "max_mm3": 18.9,
+   "phi": 330.0,
+   "theta": -6.2,
+   "screw_dx": 5.0
+  },
+  "pressure_strip_steel | blade_clamp_screws_M4": {
+   "max_mm3": 25.1,
+   "phi": 330.0,
+   "theta": -6.2,
+   "screw_dx": 5.0
+  },
+  "ratchet_wheel_50T | pawl_rod": {
+   "max_mm3": 16.4,
+   "phi": 0.0,
+   "theta": 0.0,
+   "screw_dx": -5.0
+  },
+  "arm | pawl_rod": {
+   "max_mm3": 55.6,
+   "phi": 120.0,
+   "theta": 9.9,
+   "screw_dx": -5.0
+  },
+  "pivot_strips_steel | pivot_clamp_plates_arm": {
+   "max_mm3": 47.9,
+   "phi": 180.0,
+   "theta": -2.3,
+   "screw_dx": 5.0
+  }
+ },
+ "connectivity": {
+  "frame": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "pivot_strips_steel": {
+   "shells": 3,
+   "expected": 3,
+   "ok": true
+  },
+  "pivot_clamp_plates_frame": {
+   "shells": 3,
+   "expected": 3,
+   "ok": true
+  },
+  "pivot_clamp_plates_arm": {
+   "shells": 3,
+   "expected": 3,
+   "ok": true
+  },
+  "arm": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "cassette_upper_jaw": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "cassette_thumbscrew": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "histology_cassette": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "paraffin_block": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "conrod": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "crankshaft": {
+   "shells": 2,
+   "expected": 2,
+   "ok": true
+  },
+  "crank_disc": {
+   "shells": 2,
+   "expected": 2,
+   "ok": true
+  },
+  "crank_pin": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "bearings_608": {
+   "shells": 2,
+   "expected": 2,
+   "ok": true
+  },
+  "handwheel": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "handle": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "stage_body_flexure": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "blade_holder": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "pressure_strip_steel": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "blade_clamp_screws_M4": {
+   "shells": 2,
+   "expected": 2,
+   "ok": true
+  },
+  "blade_low_profile": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "feed_screw_M8x1_25": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "feed_screw_M8x1_0": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "screw_coupler": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "feed_nuts_steel": {
+   "shells": 2,
+   "expected": 2,
+   "ok": true
+  },
+  "coupler_nut_M8x1_25": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "preload_springs": {
+   "shells": 2,
+   "expected": 2,
+   "ok": true
+  },
+  "ratchet_wheel_50T": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "thickness_selector_shield": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "feed_knob": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "pawl_rod": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "stage_clamp_knobs_M6": {
+   "shells": 2,
+   "expected": 2,
+   "ok": true
+  },
+  "fastener_heads_M3_M4": {
+   "shells": 9,
+   "expected": 9,
+   "ok": true
+  },
+  "tie_rods_M8_steel_spine": {
+   "shells": 6,
+   "expected": 6,
+   "ok": true
+  },
+  "coarse_approach_screw_M6": {
+   "shells": 1,
+   "expected": 1,
+   "ok": true
+  }
+ }
+}

@@ -1,0 +1,13 @@
+{
+ "total_usd": 61.97,
+ "by_category": {
+  "3D-printed (PLA)": 34.57,
+  "hardware": 24.8,
+  "consumable": 2.6
+ },
+ "printed_part_types": 16,
+ "printed_pieces": 20,
+ "printed_mass_g": 1730.2,
+ "printed_volume_L": 1.4,
+ "n_components": 39
+}

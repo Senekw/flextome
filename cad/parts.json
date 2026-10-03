@@ -9,7 +9,7 @@
   "material": "PLA (FDM)",
   "qty": 1,
   "printed": true,
-  "volume_cm3": 983.42
+  "volume_cm3": 961.4
  },
  {
   "name": "pivot_strips_steel",
@@ -33,7 +33,7 @@
   "material": "PLA (FDM) + M3 screws",
   "qty": 3,
   "printed": true,
-  "volume_cm3": 0.8
+  "volume_cm3": 1.39
  },
  {
   "name": "pivot_clamp_plates_arm",
@@ -45,7 +45,7 @@
   "material": "PLA (FDM) + M3 screws",
   "qty": 3,
   "printed": true,
-  "volume_cm3": 0.8
+  "volume_cm3": 1.39
  },
  {
   "name": "arm",
@@ -57,7 +57,7 @@
   "material": "PLA (FDM)",
   "qty": 1,
   "printed": true,
-  "volume_cm3": 103.94
+  "volume_cm3": 98.91
  },
  {
   "name": "cassette_upper_jaw",
@@ -201,7 +201,7 @@
   "material": "PLA (FDM)",
   "qty": 1,
   "printed": true,
-  "volume_cm3": 108.03
+  "volume_cm3": 148.28
  },
  {
   "name": "blade_holder",
@@ -213,7 +213,7 @@
   "material": "PLA (FDM)",
   "qty": 1,
   "printed": true,
-  "volume_cm3": 11.3
+  "volume_cm3": 29.64
  },
  {
   "name": "pressure_strip_steel",
@@ -222,22 +222,22 @@
    0.6,
    0.66
   ],
-  "material": "1.0 mm steel feeler-gauge strip 84x11",
+  "material": "1.0 mm steel feeler-gauge strip 84x14, 2 holes",
   "qty": 1,
   "printed": false,
-  "volume_cm3": 0.92
+  "volume_cm3": 1.18
  },
  {
-  "name": "blade_grub_screws_M4",
+  "name": "blade_clamp_screws_M4",
   "color": [
    0.2,
    0.2,
    0.22
   ],
-  "material": "M4 grub screw x2",
+  "material": "M4 x 12 cap screw x2 + heat-set inserts",
   "qty": 2,
   "printed": false,
-  "volume_cm3": 0.78
+  "volume_cm3": 0.56
  },
  {
   "name": "blade_low_profile",
@@ -258,10 +258,10 @@
    0.5,
    0.55
   ],
-  "material": "M8x1.25 threaded rod 50 mm",
+  "material": "M8x1.25 threaded rod 55 mm",
   "qty": 1,
   "printed": false,
-  "volume_cm3": 2.31
+  "volume_cm3": 2.8
  },
  {
   "name": "feed_screw_M8x1_0",
@@ -270,10 +270,10 @@
    0.6,
    0.65
   ],
-  "material": "M8x1.0 fine bolt 30 mm",
+  "material": "M8x1.0 fine hex bolt 25 mm",
   "qty": 1,
   "printed": false,
-  "volume_cm3": 1.41
+  "volume_cm3": 1.83
  },
  {
   "name": "screw_coupler",
@@ -285,7 +285,43 @@
   "material": "PLA (FDM)",
   "qty": 1,
   "printed": true,
-  "volume_cm3": 0.7
+  "volume_cm3": 2.36
+ },
+ {
+  "name": "feed_nuts_steel",
+  "color": [
+   0.5,
+   0.5,
+   0.55
+  ],
+  "material": "M8x1.0 nut (tab) + M8x1.25 nut (frame)",
+  "qty": 2,
+  "printed": false,
+  "volume_cm3": 0.88
+ },
+ {
+  "name": "coupler_nut_M8x1_25",
+  "color": [
+   0.5,
+   0.5,
+   0.55
+  ],
+  "material": "M8x1.25 thin nut (captured in coupler)",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 0.37
+ },
+ {
+  "name": "preload_springs",
+  "color": [
+   0.55,
+   0.55,
+   0.6
+  ],
+  "material": "extension spring 5 x 20 mm, ~5 N",
+  "qty": 2,
+  "printed": false,
+  "volume_cm3": 0.42
  },
  {
   "name": "ratchet_wheel_50T",
@@ -309,7 +345,7 @@
   "material": "PLA (FDM)",
   "qty": 1,
   "printed": true,
-  "volume_cm3": 6.32
+  "volume_cm3": 6.59
  },
  {
   "name": "feed_knob",
@@ -333,7 +369,7 @@
   "material": "PLA (FDM)",
   "qty": 1,
   "printed": true,
-  "volume_cm3": 9.64
+  "volume_cm3": 9.71
  },
  {
   "name": "stage_clamp_knobs_M6",
@@ -357,7 +393,7 @@
   "material": "M4 x 12 socket screws x8 (visual)",
   "qty": 8,
   "printed": false,
-  "volume_cm3": 0.7
+  "volume_cm3": 0.77
  },
  {
   "name": "tie_rods_M8_steel_spine",

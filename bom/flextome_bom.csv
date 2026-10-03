@@ -1,37 +1,40 @@
 item,category,qty,spec,unit_cost_usd,source,mass_g,line_cost_usd
-frame,3D-printed (PLA),1,983.42 cm3 modelled solid,24.39,filament @ $20/kg,1219.4,24.39
-pivot_clamp_plates_frame,3D-printed (PLA),3,0.80 cm3 modelled solid,0.02,filament @ $20/kg,1.0,0.06
-pivot_clamp_plates_arm,3D-printed (PLA),3,0.80 cm3 modelled solid,0.02,filament @ $20/kg,1.0,0.06
-arm,3D-printed (PLA),1,103.94 cm3 modelled solid,2.58,filament @ $20/kg,128.9,2.58
+frame,3D-printed (PLA),1,961.40 cm3 modelled solid,23.84,filament @ $20/kg,1192.1,23.84
+pivot_clamp_plates_frame,3D-printed (PLA),3,1.39 cm3 modelled solid,0.03,filament @ $20/kg,1.7,0.09
+pivot_clamp_plates_arm,3D-printed (PLA),3,1.39 cm3 modelled solid,0.03,filament @ $20/kg,1.7,0.09
+arm,3D-printed (PLA),1,98.91 cm3 modelled solid,2.45,filament @ $20/kg,122.6,2.45
 cassette_upper_jaw,3D-printed (PLA),1,3.28 cm3 modelled solid,0.08,filament @ $20/kg,4.1,0.08
 conrod,3D-printed (PLA),1,12.67 cm3 modelled solid,0.31,filament @ $20/kg,15.7,0.31
 crank_disc,3D-printed (PLA),1,23.48 cm3 modelled solid,0.58,filament @ $20/kg,29.1,0.58
 handwheel,3D-printed (PLA),1,57.17 cm3 modelled solid,1.42,filament @ $20/kg,70.9,1.42
 handle,3D-printed (PLA),1,5.78 cm3 modelled solid,0.14,filament @ $20/kg,7.2,0.14
-stage_body_flexure,3D-printed (PLA),1,108.03 cm3 modelled solid,2.68,filament @ $20/kg,134.0,2.68
-blade_holder,3D-printed (PLA),1,11.30 cm3 modelled solid,0.28,filament @ $20/kg,14.0,0.28
-screw_coupler,3D-printed (PLA),1,0.70 cm3 modelled solid,0.02,filament @ $20/kg,0.9,0.02
+stage_body_flexure,3D-printed (PLA),1,148.28 cm3 modelled solid,3.68,filament @ $20/kg,183.9,3.68
+blade_holder,3D-printed (PLA),1,29.64 cm3 modelled solid,0.74,filament @ $20/kg,36.8,0.74
+screw_coupler,3D-printed (PLA),1,2.36 cm3 modelled solid,0.06,filament @ $20/kg,2.9,0.06
 ratchet_wheel_50T,3D-printed (PLA),1,22.90 cm3 modelled solid,0.57,filament @ $20/kg,28.4,0.57
-thickness_selector_shield,3D-printed (PLA),1,6.32 cm3 modelled solid,0.16,filament @ $20/kg,7.8,0.16
+thickness_selector_shield,3D-printed (PLA),1,6.59 cm3 modelled solid,0.16,filament @ $20/kg,8.2,0.16
 feed_knob,3D-printed (PLA),1,4.90 cm3 modelled solid,0.12,filament @ $20/kg,6.1,0.12
-pawl_rod,3D-printed (PLA),1,9.64 cm3 modelled solid,0.24,filament @ $20/kg,12.0,0.24
+pawl_rod,3D-printed (PLA),1,9.71 cm3 modelled solid,0.24,filament @ $20/kg,12.0,0.24
 spring-steel feeler gauge strips 0.20 mm (from a 32-blade set),hardware,1,set; 3 strips cut to 10/20/10 x 32 mm,6.0,hardware store / online,,6.0
-"steel pressure strip 1.0 mm (feeler gauge blade, 84 x 11 mm)",hardware,1,from same set,0.0,included above,,0.0
-608ZZ ball bearing,hardware,2,8x22x7 mm,1.0,skate/3D-printer supplier,,2.0
-"8 mm steel shaft, 200 mm",hardware,1,smooth rod (or M8 threaded rod),3.0,3D-printer supplier,,3.0
-"M8 x 1.25 threaded rod, 250 mm (base spine)",hardware,2,zinc steel,1.5,hardware store,,3.0
-"M8 x 1.25 threaded rod, 50 mm (feed screw rear)",hardware,1,cut from rod,0.3,hardware store,,0.3
-"M8 x 1.0 fine-pitch bolt, 30 mm (feed screw front)",hardware,1,class 8.8,1.2,automotive / online,,1.2
-M8 x 1.25 nut,hardware,5,frame nut + 4 spine nuts,0.1,hardware store,,0.5
-M8 x 1.0 fine nut,hardware,2,stage tab nut + jam nut,0.4,automotive / online,,0.8
+"steel clamp strip 1.0 mm (feeler gauge blade, 84 x 14 mm, 2 holes)",hardware,1,from the same set,0.0,included above,,0.0
+608ZZ ball bearing,hardware,2,8 x 22 x 7 mm,1.0,skate / 3D-printer supplier,,2.0
+8 mm steel shaft stubs (2 x 60 mm),hardware,1,"smooth rod, cut",3.0,3D-printer supplier,,3.0
+"M8 x 1.25 threaded rod, 250 mm (base tie rods)",hardware,2,zinc steel,1.5,hardware store,,3.0
+"M8 x 1.25 threaded rod, 55 mm (feed screw, rear)",hardware,1,cut from rod,0.3,hardware store,,0.3
+"M8 x 1.0 fine-pitch hex bolt, 25 mm (feed screw, front)",hardware,1,class 8.8,1.2,automotive / online,,1.2
+M8 x 1.25 nut,hardware,5,frame nut + 4 tie-rod nuts,0.1,hardware store,,0.5
+"M8 x 1.25 thin nut (coupler, captured)",hardware,1,4 mm,0.15,hardware store,,0.15
+M8 x 1.0 fine nut (stage tab),hardware,1,,0.4,automotive / online,,0.4
+"M8 steel washer, 16 mm OD (under tab nut and frame nut)",hardware,2,form A,0.05,hardware store,,0.1
 disposable low-profile microtome blade,consumable,1,80 x 8 x 0.25 mm (any brand),0.6,lab supplier ($30/50),,0.6
-M3 x 8 screws + heat-set inserts (pivot clamps),hardware,12,,0.1,online,,1.2000000000000002
-M4 grub screws (blade clamp),hardware,2,,0.15,online,,0.3
+"M3 x 8 screws + heat-set inserts (pivot clamp pads, selector strap)",hardware,13,,0.1,online,,1.3
+M4 x 12 cap screws + heat-set inserts (blade clamp strip),hardware,2,,0.15,online,,0.3
+M4 x 12 cap screws + inserts (blade holder to platform),hardware,4,,0.15,online,,0.6
+"M4 set screws (crank webs on shaft stubs, handwheel hub)",hardware,3,,0.15,online,,0.45
 M5 x 30 thumbscrew (cassette clamp),hardware,1,,0.8,online,,0.8
-M5 shoulder bolt / crank pin,hardware,1,5 x 20 mm,0.8,online,,0.8
-"M4 set screws (crank disc, handwheel hub)",hardware,2,,0.15,online,,0.3
+M5 shoulder bolt / crank pin,hardware,1,5 x 30 mm,0.8,online,,0.8
 M6 knob bolts + heat-set inserts (stage clamp),hardware,2,,1.2,online,,2.4
 M6 x 40 bolt + printed knob (coarse approach),hardware,1,,0.4,hardware store,,0.4
-"tension spring (arm counterbalance, ~2 N/mm)",hardware,1,,0.8,hardware store,,0.8
+"extension springs 5 x 20 mm, ~5 N (stage preload)",hardware,2,,0.4,hardware store,,0.8
 "compression spring (pawl rod return, light)",hardware,1,,0.3,hardware store,,0.3
-"cyanoacrylate / epoxy, PTFE grease",consumable,1,,2.0,hardware store,,2.0
+"cyanoacrylate / epoxy, PTFE grease, thread locker",consumable,1,,2.0,hardware store,,2.0

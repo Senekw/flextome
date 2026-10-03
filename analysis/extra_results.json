@@ -8,17 +8,60 @@
   2.4104711137488857
  ],
  "dull_Fx_max": 1.2891334124665694,
- "levers": {
-  "baseline_C": 0.9994688107918567,
-  "overhang2_C": 0.8774688107918566,
-  "insert_C": 0.7274688107918567,
-  "brass_insert_alone_C": 0.8494688107918568,
-  "brass_insert_alone_sd": 0.5171581592523712
+ "modes": {
+  "f_arm_z_Hz": 357.4019862176033,
+  "f_stage_x_Hz": 1549.9490884054069,
+  "f_loop_x_Hz": 458.9515977714004,
+  "cut_duration_s": 0.11764705882352941,
+  "excitation_below_Hz": 8.5
  },
  "transient": {
-  "qs_um": 1.9989376215837134,
-  "peak_um": 2.361163770356885,
-  "settle_ms": 42.15250219628421
+  "qs_um": 2.4051185432031117,
+  "peak_um": 2.8145016805857184,
+  "overshoot_pct": 17.02132888790564,
+  "settle_ms": 46.23724850717089
  },
- "sd_at_Fv_0p2": 0.4381261418242782
+ "loop": {
+  "C_um_per_N": 1.2025592716015558,
+  "k_N_per_um": 0.8315598437557348
+ },
+ "levers": {
+  "rev2_washer (baseline)": {
+   "C_um_per_N": 1.203,
+   "sd_um": 0.716
+  },
+  "rev2_bare_nuts": {
+   "C_um_per_N": 1.469,
+   "sd_um": 0.86
+  },
+  "rev2_brass_inserts": {
+   "C_um_per_N": 1.169,
+   "sd_um": 0.699
+  },
+  "rev2_backwall_overhang_2.0": {
+   "C_um_per_N": 1.081,
+   "sd_um": 0.652
+  },
+  "rev2_full_contact_base": {
+   "C_um_per_N": 1.06,
+   "sd_um": 0.641
+  },
+  "rev2_all_levers": {
+   "C_um_per_N": 0.905,
+   "sd_um": 0.56
+  },
+  "rev1_as_modelled (7.35 um/N upstand, bare nut, slender-stage FE)": {
+   "C_um_per_N": 8.471,
+   "sd_um": 4.788
+  }
+ },
+ "sd_vs_force_variation": {
+  "0.1": 0.288,
+  "0.2": 0.411,
+  "0.3": 0.559,
+  "0.4": 0.716,
+  "0.6": 1.043,
+  "0.8": 1.376,
+  "1.0": 1.712
+ }
 }

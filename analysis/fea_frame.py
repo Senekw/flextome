@@ -1,7 +1,7 @@
 """2D plane-stress FE (scikit-fem, P2) of the FlexTome frame side section (x-z), unit thickness with E scaled by
 effective out-of-plane width / 150 mm.  Ribbed base: web fraction 0.4 (walls+ribs) except 6 mm solid top skin.
 Tie rods: 2 x M8 steel (A = 2*33.2 mm^2) at z=-45 -> represented as a 6.5 mm tall steel band with width scaling 2*6.5/150.
-Load: self-equilibrated couple: +F at pivot (x=0,z=95) along x, -F at the stage-foot clamp zone (x 150..172, z=30).
+Load: self-equilibrated couple: +F at pivot (x=0,z=95) along x, -F at the stage-foot clamp zone (x 148..174, z=22).
 Output: relative x displacement pivot vs deck zone per N -> base+tower compliance."""
 import numpy as np, json
 from skfem import MeshTri, Basis, ElementVector, ElementTriP2, ElementTriP0, BilinearForm, asm, condense, solve
@@ -9,12 +9,13 @@ from skfem.helpers import ddot, sym_grad, trace
 
 E_PLA = 3500.0; E_ST = 200000.0; NU = 0.36; REF_W = 150.0
 GUSSET = True
+Z_DECK = 22.0   # rev. 2 deck height
 def props(cx, cz):
     """return (E_eff) per element centroid; 0 outside."""
     E = np.zeros_like(cx)
     # base region x -40..195, z -55..0 ; deck x 110..195 z 0..30 ; tower x -40..-8 z 0..118 (width 60)
     base = (cx >= -40) & (cx <= 195) & (cz >= -55) & (cz <= 0)
-    deck = (cx >= 110) & (cx <= 195) & (cz >= 0) & (cz <= 30)
+    deck = (cx >= 110) & (cx <= 195) & (cz >= 0) & (cz <= Z_DECK)
     if GUSSET:
         # polygon (-40,0),(20,0),(20,55),(-8,80),(-8,118),(-40,118)
         tower = (cx >= -40) & (cz >= 0) & (cz <= 118) & ((cx <= -8) | ((cz <= 55) & (cx <= 20)) | ((cz > 55) & (cz < 80) & (cx <= 20 - 28*(cz-55)/25)))
@@ -31,7 +32,7 @@ def props(cx, cz):
     E[rods] = E_ST*(2*6.5/REF_W)
     return E
 
-def run(h=1.0, tie_rods=True, F=1.0):
+def run(h=1.0, tie_rods=True, F=1.0, support="full"):
     xs = np.arange(-40, 195.001, h); zs = np.arange(-55, 118.001, h)
     m = MeshTri.init_tensor(xs, zs)
     c = m.p[:, m.t].mean(axis=1); E = props(c[0], c[1])
@@ -50,10 +51,14 @@ def run(h=1.0, tie_rods=True, F=1.0):
         return 2*mu*ddot(sym_grad(u), sym_grad(v)) + lam*trace(sym_grad(u))*trace(sym_grad(v))
     K = asm(stiff, basis, E=Ef)
     # supports: bottom z=-55 fixed in z (table); one node fixed in x (rigid body) at x=80
-    bot = basis.get_dofs(lambda x: x[1] < -55+1e-6)
-    D = np.concatenate([bot.nodal["u^2"], basis.get_dofs(lambda x: (x[1] < -55+1e-6) & (np.abs(x[0]-80) < 0.6)).nodal["u^1"]])
+    # support="full": whole underside rests on the bench (z fixed); "two_feet": only 15 mm pads at each end carry the base
+    if support == "full":
+        bot = basis.get_dofs(lambda x: x[1] < -55+1e-6)
+    else:
+        bot = basis.get_dofs(lambda x: (x[1] < -55+1e-6) & ((x[0] < -25) | (x[0] > 180)))
+    D = np.concatenate([bot.nodal["u^2"], basis.get_dofs(lambda x: (x[1] < -55+1e-6) & (np.abs(x[0]-80) < 0.6) if support == "full" else (x[1] < -55+1e-6) & (x[0] < -25)).nodal["u^1"]])
     piv = basis.get_dofs(lambda x: (x[0] < -8+1e-6) & (x[0] > -9) & (np.abs(x[1]-95) < 3)).nodal["u^1"]
-    deckz = basis.get_dofs(lambda x: (x[0] > 150) & (x[0] < 172) & (x[1] > 30-1e-6)).nodal["u^1"]
+    deckz = basis.get_dofs(lambda x: (x[0] > 148) & (x[0] < 174) & (x[1] > Z_DECK-1e-6)).nodal["u^1"]
     f = np.zeros(basis.N); f[piv] = F/len(piv); f[deckz] = -F/len(deckz)
     u = solve(*condense(K, f, D=D))
     rel = (u[piv].mean() - u[deckz].mean())/REF_W   # mm per N (unit thickness -> /150 mm)
@@ -70,6 +75,11 @@ if __name__ == "__main__":
             out[key] = rel*1e3
             print(key, "frame compliance pivot-deck: %.3f um/N" % (rel*1e3), "elements", m.t.shape[1])
     GUSSET = True
+    for tr in (True, False):
+        m, basis, u, rel = run(tie_rods=tr, support="two_feet")
+        key = "gusset_twofeet" + ("_tierods" if tr else "_norods"); out[key] = rel*1e3
+        print(key, "frame compliance pivot-deck: %.3f um/N" % (rel*1e3))
+    # deck reference: with the rev-2 deck at z=22 the knob clamp zone is x 148-174 on the deck top
     json.dump(out, open("fea_frame_results.json", "w"))
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
     from matplotlib.tri import Triangulation

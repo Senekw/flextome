@@ -107,7 +107,7 @@ ax.text(-3.5, -5, "block\nmotion", fontsize=6.5, color=C["arm"], ha="right", va=
 # pressure strip: 1 mm steel under blade, top 2.5 mm below edge measured along blade
 ps0 = E + 2.5*d - (tb/2)*n
 ax.add_patch(Polygon([ps0, ps0 + 7*d, ps0 + 7*d - 1.0*n, ps0 - 1.0*n], closed=True, fc="0.45", ec="0.1", lw=0.6))
-ax.text(*(ps0 + 4*d - 1.9*n), "steel pressure strip 1.0 mm", fontsize=6, rotation=-63, ha="center", va="center", color="0.2")
+ax.text(*(ps0 + 4*d - 1.9*n), "steel clamp strip 1.0 mm", fontsize=6, rotation=-63, ha="center", va="center", color="0.2")
 ax.text(*(E + 6*d + 1.0*n), "blade 0.25 mm,\n35° facet", fontsize=6.5, rotation=-63, ha="center", va="center")
 # angle arcs
 ax.add_patch(Arc((0, 0), 6, 6, angle=0, theta1=270, theta2=270+27, color=C["acc"], lw=0.9))
@@ -143,7 +143,7 @@ ax.add_patch(Rectangle((-10, -4), 62, 8, fc="0.6", ec="0.2", lw=0.7))
 # threads: pitch 1.0 on left section, 1.25 on right
 for x in np.arange(-9, 20, 1.0): ax.plot([x, x+0.5], [-4, 4], color="0.25", lw=0.5)
 for x in np.arange(24, 52, 1.25): ax.plot([x, x+0.6], [-4, 4], color="0.25", lw=0.5)
-ax.add_patch(Rectangle((19, -6), 5, 12, fc="0.4", ec="0.2", lw=0.6)); ax.text(21.5, -9, "coupler\n+ jam nut", ha="center", fontsize=6, va="top")
+ax.add_patch(Rectangle((19, -6), 5, 12, fc="0.4", ec="0.2", lw=0.6)); ax.text(21.5, -9, "coupler\n(captured nut)", ha="center", fontsize=6, va="top")
 ax.add_patch(Rectangle((52, -9), 8, 18, fc=C["acc"], ec="0.2", lw=0.6)); ax.text(61, -16, "ratchet drum\n50 T × 14 mm", ha="center", fontsize=6.5, color=C["acc"], va="top")
 ax.text(4, -7, "M8 × 1.0", fontsize=6.5, ha="center", va="top"); ax.text(38, -7, "M8 × 1.25", fontsize=6.5, ha="center", va="top")
 ax.annotate("", xy=(50, -20), xytext=(38, -20), arrowprops=dict(arrowstyle="->", lw=1, color="0.2")); ax.text(44, -22, "screw advances 1.25 mm/rev\nrelative to the frame", fontsize=6.5, ha="center", va="top")
@@ -155,12 +155,12 @@ ax = axs[1]
 teeth = np.arange(1, 7); ax.bar(teeth, 5*teeth, color=C["acc"], width=0.6)
 for t_, v in zip(teeth, 5*teeth): ax.text(t_, v+0.8, f"{v} µm", ha="center", fontsize=7)
 ax.set_xlabel("teeth released per stroke (selector)"); ax.set_ylabel("section thickness (µm)"); ax.set_ylim(0, 46)
-ax.text(0.03, 0.97, "screw travels ±5 mm for ±1 mm stage travel\n(5:1 reduction) → 400 sections at 5 µm per reset;\npitch-error sensitivity: δt/t = (δp₁ − δp₂)/0.25 mm\n→ 0.37 µm (1 s.d.) in the budget", transform=ax.transAxes, fontsize=6.5, va="top")
+ax.text(0.03, 0.97, "screw travels ±5 mm for ±1 mm stage travel\n(5:1 reduction) → 400 sections at 5 µm per reset;\nlead-error sensitivity: δt/t = (δp₁ − δp₂)/0.25 mm\n→ bias within ±0.7 % per machine, 0.18 µm scatter", transform=ax.transAxes, fontsize=6.5, va="top")
 ax.set_title("(b) Thickness selector", fontsize=8, loc="left")
 fig.savefig("figM3_differential_screw.png", dpi=220, bbox_inches="tight"); plt.close(fig)
 
 # ================= M4: cross-strip pivot + metrology loop =================
-fig, axs = plt.subplots(1, 2, figsize=(7.6, 4.2), gridspec_kw=dict(width_ratios=[1, 1.1], wspace=0.55))
+fig, axs = plt.subplots(1, 2, figsize=(7.8, 4.4), gridspec_kw=dict(width_ratios=[1, 1.15], wspace=0.6))
 ax = axs[0]; ax.set_aspect("equal")
 Lf = 20.0
 for ang, w in [(45, 20), (-45, 10)]:
@@ -185,18 +185,18 @@ ax.set_xlim(-21, 21); ax.set_ylim(-36, 42); ax.axis("off")
 ax.set_title("(a) Cross-strip flexure pivot", fontsize=8, loc="left")
 ax = axs[1]
 lc = dr["loop_compliance_um_per_N"]
-order = [("blade overhang (2.5 mm)", "blade_overhang"), ("pressure strip / holder", "blade_clamp_compression"), ("stage pitch (FE)", "stage_pitch"),
-         ("screw tip contact", "ball_contact"), ("screw axial", "screw_axial"), ("nut bedding in PLA", "thread_nut_in_PLA"),
-         ("frame: upstand→base→tower (FE)", "frame_tower_base_FE"), ("flexure pivot axial", "pivot_axial"), ("arm axial", "arm_axial"), ("cassette clamp", "cassette_clamp")]
+order = [("blade overhang (2.5 mm)", "blade_overhang"), ("blade on holder back wall", "blade_backwall_bearing"), ("stage pitch about tab nut (FE)", "stage_pitch"),
+         ("tab nut on washer", "tab_nut_bedding"), ("fine bolt + rod axial", "screw_axial"), ("rod end on bolt head", "coupler_steel_contact"), ("frame nut on washer", "frame_nut_bedding"),
+         ("gusseted upstand (FE)", "upstand_FE"), ("frame: tower + base, two end pads (FE)", "frame_tower_base_FE"), ("flexure pivot axial", "pivot_axial"), ("arm axial", "arm_axial"), ("cassette clamp", "cassette_clamp")]
 vals = [lc[k] for _, k in order]; labels = [l for l, _ in order]
 y = np.arange(len(order))[::-1]
-cols = [C["stage"]]*6 + [C["frame"], C["steel"], C["arm"], C["arm"]]
+cols = [C["stage"]]*7 + [C["stage"], C["frame"], C["steel"], C["arm"], C["arm"]]
 ax.barh(y, vals, color=cols, height=0.65)
 for yi, v in zip(y, vals): ax.text(v + 0.004, yi, f"{v:.3f}", va="center", fontsize=6.5)
-ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=6.8); ax.set_xlabel("feed-axis compliance (µm/N)"); ax.set_xlim(0, 0.36)
+ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=6.8); ax.set_xlabel("feed-axis compliance (µm/N)"); ax.set_xlim(0, 0.46)
 tot = sum(lc.values())
-ax.text(0.98, 0.05, f"series sum {tot:.2f} µm/N → stiffness {1/tot:.2f} N/µm\nforce path: blade edge → stage → screw\n→ frame → pivot → arm → block face", transform=ax.transAxes, ha="right", fontsize=6.3)
-ax.set_title("(b) Loop compliance by element", fontsize=8, loc="left")
+ax.text(0.98, 0.05, f"series sum {tot:.2f} µm/N → stiffness {1/tot:.2f} N/µm\nforce path: blade edge → stage → screw train\n→ upstand → frame → pivot → arm → block face", transform=ax.transAxes, ha="right", fontsize=6.3)
+ax.set_title("(b) Loop compliance by element (rev. 2)", fontsize=8, loc="left")
 fig.savefig("figM4_pivot_loop.png", dpi=220, bbox_inches="tight"); plt.close(fig)
 
 # ================= M5: feed timing over one revolution =================

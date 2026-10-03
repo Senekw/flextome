@@ -49,14 +49,14 @@ fig.tight_layout(); fig.savefig("fig2_kinematics_pivot.png", dpi=300); plt.close
 # ---------------------------------------------------------------- Fig 3: error budget
 s = fd.summary(d); lc = s["loop_compliance_um_per_N"]
 items = sorted(lc.items(), key=lambda kv: kv[1])
-names = {"frame_tower_base_FE": "frame: gusseted tower + base (FE)", "base_rotation": "base rotation", "blade_overhang": "blade overhang 2.5 mm",
-         "stage_pitch": "feed-stage pitch coupling", "thread_nut_in_PLA": "nut bedding in PLA", "tower_bending": "tower bending",
-         "ball_contact": "screw-tip contact", "arm_axial": "arm axial", "pivot_axial": "pivot strips axial", "cassette_clamp": "cassette clamp",
-         "screw_axial": "feed screw axial", "blade_clamp_compression": "blade holder compression"}
+names = {"frame_tower_base_FE": "frame: tower + base on two end pads (FE)", "blade_overhang": "blade overhang 2.5 mm", "upstand_FE": "frame-nut upstand, gusseted (FE)",
+         "stage_pitch": "stage pitch about the tab nut (FE)", "tab_nut_bedding": "tab nut on washer", "frame_nut_bedding": "frame nut on washer",
+         "coupler_steel_contact": "rod end on bolt head", "arm_axial": "arm axial", "pivot_axial": "pivot strips axial", "cassette_clamp": "cassette clamp",
+         "screw_axial": "feed screw axial", "blade_backwall_bearing": "blade on holder back wall"}
 fig = plt.figure(figsize=(7.2, 6.0))
 gs = fig.add_gridspec(2, 2, height_ratios=[1.1, 1])
 ax = fig.add_subplot(gs[0, :])
-ax.barh([names[k] for k, v in items], [v for k, v in items], color=[C_FOCAL if k in ("frame_tower_base_FE","blade_overhang") else C_A for k, v in items])
+ax.barh([names[k] for k, v in items], [v for k, v in items], color=[C_FOCAL if k in ("frame_tower_base_FE","blade_overhang","upstand_FE") else C_A for k, v in items])
 tot = sum(lc.values())
 ax.set_xlabel("feed-axis compliance (µm/N)")
 ax.set_title(f"Loop compliance budget: {tot:.2f} µm/N total (stiffness {1/tot:.2f} N/µm)")
@@ -71,17 +71,17 @@ ax.set_title("Monte-Carlo section thickness")
 ax.legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.28)); ax.set_ylim(0, 1300)
 ax = fig.add_subplot(gs[1, 1])
 mc = fd.monte_carlo(d)
-contrib = mc["contrib"]; labs = {"compliance": "compliance x cut-force variation", "thread_pitch": "differential thread pitch", "pawl": "pawl seating",
-                                "ratchet_tooth": "printed ratchet tooth pitch", "thermal": "thermal drift (1 s)"}
+contrib = mc["contrib"]; labs = {"compliance": "compliance x cut-force change (√2·σF)", "thread_lead": "thread lead (periodic + local)", "thread_bias": "thread lead bias (per screw pair)",
+                                "pawl": "pawl seating", "ratchet_tooth": "printed ratchet tooth pitch", "thermal": "thermal drift (1 s)"}
 ks = sorted(contrib, key=lambda k: contrib[k])
 ax.barh([labs[k] for k in ks], [contrib[k]*1e6 for k in ks], color=C_A)
 for i, k in enumerate(ks): ax.text(contrib[k]*1e6+0.01, i, f"{contrib[k]*1e6:.2f}", va="center", fontsize=7)
-ax.set_xlabel("1 s.d. contribution to thickness (µm)"); ax.set_title("Compliance and thread pitch dominate"); ax.margins(x=0.2)
+ax.set_xlabel("1 s.d. contribution to thickness (µm)"); ax.set_title("Force change through the loop dominates"); ax.margins(x=0.2)
 for a, l in zip(fig.axes, "abc"): panel_letter(a, l)
 fig.tight_layout(); fig.savefig("fig3_error_budget.png", dpi=300); plt.close(fig)
 
 # ---------------------------------------------------------------- Fig 4: stage flexure design map + stiffness sensitivity
-fig, axs = plt.subplots(1, 2, figsize=(7.2, 3.3))
+fig, axs = plt.subplots(1, 2, figsize=(7.6, 3.5), gridspec_kw=dict(width_ratios=[1, 1.15]))
 ax = axs[0]
 T = np.linspace(0.6, 1.6, 60)*1e-3; H = np.linspace(0.025, 0.060, 60)
 TT, HH = np.meshgrid(T, H)
@@ -98,15 +98,18 @@ ax.set_xlabel("flexure plate thickness (mm)"); ax.set_ylabel("plate free height 
 ax.set_title("Stage plates below 15 MPa PLA creep line")
 ax = axs[1]
 Fv = np.linspace(0.1, 1.0, 50)
-for cf, col, lab in ((0.8315e-6, C_B, "slender 32 mm tower (FE 0.83 µm/N)"), (0.2127e-6, C_FOCAL, "gusseted 60 mm-root tower (FE 0.21 µm/N, chosen)")):
-    dd = fd.Design(frame_fe_compliance=cf)
-    Ct = sum(fd.loop_compliance(dd).values())
-    std = np.sqrt((Ct*Fv)**2 + (0.371e-6)**2 + (0.1e-6)**2 + (0.066e-6)**2)
-    ax.plot(Fv, std*1e6, color=col, lw=2 if cf < 0.5e-6 else 1.2, label=lab)
-ax.axvline(d.F_cut_var, color="0.5", ls=":", lw=0.8); ax.text(d.F_cut_var+0.01, 0.45, "assumed 0.4 N (1 s.d.)", fontsize=7, color="0.4")
-ax.set_xlabel("stroke-to-stroke cutting-force variation (N, 1 s.d.)"); ax.set_ylabel("section-thickness scatter (µm, 1 s.d.)")
-ax.set_title("Tower gusset cuts force-driven scatter by ~25 %")
-ax.legend(frameon=False, fontsize=7, loc="upper left")
+def sd_curve(dd):
+    Ct = sum(fd.loop_compliance(dd).values()); mc = fd.monte_carlo(dd)
+    other = np.sqrt(mc["std"]**2 - (np.sqrt(2)*Ct*dd.F_cut_var)**2)
+    return np.sqrt((np.sqrt(2)*Ct*Fv)**2 + other**2)*1e6, Ct*1e6
+for dd, col, lw, lab in ((fd.Design(), C_FOCAL, 2.0, "rev. 2 as designed ({C:.2f} µm/N)"),
+                         (fd.Design(nut_seat="insert", blade_support_overhang=2.0e-3, frame_fe_compliance=0.2107e-6), C_A, 1.2, "rev. 2 + brass inserts, 2.0 mm\noverhang, full-contact base ({C:.2f} µm/N)")):
+    y, Ct = sd_curve(dd); ax.plot(Fv, y, color=col, lw=lw, label=lab.format(C=Ct))
+ax.axvline(d.F_cut_var, color="0.5", ls=":", lw=0.8); ax.text(d.F_cut_var+0.015, 1.05, "assumed 0.4 N", fontsize=7, color="0.4", rotation=90, va="bottom")
+ax.text(0.98, 0.04, "rev. 1 load path (7.3 µm/N upstand):\n4.8 µm at 0.4 N, off scale", transform=ax.transAxes, ha="right", fontsize=6.5, color="0.35")
+ax.set_xlabel("per-stroke cutting-force variation (N, 1 s.d.)"); ax.set_ylabel("section-thickness scatter (µm, 1 s.d.)")
+ax.set_title("Scatter = force variation × loop compliance"); ax.set_ylim(0, 1.8)
+ax.legend(frameon=False, fontsize=6.5, loc="upper left")
 for a, l in zip(axs, "ab"): panel_letter(a, l)
 fig.tight_layout(); fig.savefig("fig4_stage_design_map.png", dpi=300); plt.close(fig)
 

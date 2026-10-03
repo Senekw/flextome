@@ -46,8 +46,11 @@ class Design:
     st_s: float = 0.043         # separation of the two plates along x [m]
     st_mat: str = "PLA"
     st_travel: float = 1.0e-3   # fine-feed range (+-) [m]; screw translates 5x this
-    stage_fe_compliance: float = 0.1086e-6  # [m/N] from fea_stage.py
-    frame_fe_compliance: float = 0.2127e-6  # [m/N] pivot-to-deck, gusseted tower, from fea_frame.py (None -> analytic tower+base)
+    stage_fe_compliance: float = 0.1318e-6  # [m/N] nut-held stage at the blade, rev. 2 geometry, from fea_stage.py
+    upstand_fe_compliance: float = 0.185e-6 # [m/N] gusseted frame-nut upstand under the screw reaction, from fea_upstand.py (rev. 1: 7.35e-6)
+    frame_fe_compliance: float = 0.353e-6   # [m/N] pivot-to-deck, gusseted tower, base on two end pads (conservative), fea_frame.py; 0.211e-6 for full-contact base
+    nut_seat: str = "washer"                # "bare" (nut face on PLA layer lines), "washer" (16 mm steel washer under each nut), "insert" (brass insert)
+    blade_support_overhang: float = 2.5e-3  # blade cantilever beyond the holder back wall [m] (same as the strip side by default)
     # --- structural members (printed)
     frame_mat: str = "PLA"
     arm_sec: tuple = (0.040, 0.040, 0.003)   # outer w, h, wall thickness of box arm [m]
@@ -59,7 +62,11 @@ class Design:
     base_len: float = 0.230
     # --- cutting
     F_cut_nom: float = 2.0      # nominal normal (x) cutting force [N]
-    F_cut_var: float = 0.4      # 1-sigma stroke-to-stroke variation of F_x [N]
+    F_cut_var: float = 0.4      # 1-sigma variation of the feed-axis cutting force PER STROKE [N]; thickness depends on the
+                                # difference between consecutive strokes, so its s.d. is sqrt(2) x this (handled in monte_carlo)
+    lead_bias_pct: float = 0.10 # cumulative lead error of each thread, uniform +-this % (ISO 6g rolled thread, ~0.025 mm over 25 mm)
+    lead_periodic_um: float = 1.5  # per-revolution periodic (drunken-thread) error amplitude of each thread [um]
+    lead_local_pct: float = 0.3 # random local pitch deviation of each thread, 1 s.d., % of pitch, independent per tooth step
     clearance_nom_deg: float = 9.5
     section_um: float = 5.0
 
@@ -136,7 +143,7 @@ def stage_props(d: Design):
     # stiffness along y (plates in-plane bending about z): I_y = t*w^3/12
     k_y = 2*12*m["E"]*(d.st_t*d.st_w**3/12)/d.st_h**3
     return dict(k_x=k_x, F_preload_max=F_preload_max, sigma=sigma, strain=strain, k_pitch=k_pitch,
-                k_z=k_z, k_y=k_y, safety_yield=m["sy"]/sigma, safety_creep=(0.3*m["sy"])/sigma)
+                k_z=k_z, k_y=k_y, safety_yield=m["sy"]/sigma, safety_creep=(15e6)/sigma)   # 15 MPa sustained-stress limit: an ASSUMPTION for PLA (~0.3 x yield), not taken from a measured creep curve
 
 # ----------------------------------------------------------------------------- structural loop compliance (x direction at the cut)
 def box_I(w, h, t):
@@ -169,21 +176,24 @@ def loop_compliance(d: Design):
         k_theta_base = EI_base/d.L_arm
         h_na = d.z_pivot + d.base_depth/2
         c["base_rotation"] = (h_na**2)/k_theta_base
-    # 5 blade stage: force along x is carried by the screw-tip contact (Hertz) + screw column + frame nut; stage plates add
-    #   compliance in parallel but tiny: screw M8 steel L=60mm
+    # 5 feed train (rev. 2 load path): blade -> holder -> platform -> plates (pitch) -> tab nut -> fine bolt -> bolt head on
+    #    rod end (steel-steel) -> coarse rod -> frame nut -> upstand -> foot -> deck.  No ball contact exists in the design.
     A_screw = np.pi*(6.5e-3/2)**2
-    c["screw_axial"] = 0.060/(200e9*A_screw)
-    # Hertz contact: 6 mm steel ball on steel pad, F~2N preload+cut -> use linearised stiffness ~ 1e7 N/m
-    c["ball_contact"] = 1/1.0e7
-    # thread contact (nut flank elastic) ~ 2e7 N/m for steel nut in printed holder incl. PLA bedding
-    c["thread_nut_in_PLA"] = 1/0.5e7
-    # 6 blade holder + blade overhang bending: blade 0.25mm thick protruding 1.5 mm beyond clamp (cantilever) ,width 80mm
-    E_bl = 200e9; t_bl = 0.25e-3; w_bl = 0.080; L_ov = d.blade_overhang
+    c["screw_axial"] = 0.045/(200e9*A_screw)            # fine bolt + rod between the two nuts (~45 mm of M8 core)
+    c["coupler_steel_contact"] = 1/5.0e7                 # rod end bearing on the bolt head, steel on steel (linearised Hertz, ~2 N)
+    # nut bedding on the printed pocket floor: bare AF13 face on PLA layer lines ~0.5e7 N/m (allowance for roughness/creep);
+    # a 16 mm steel washer doubles the bearing area and removes the layer-line contact -> ~1.5e7; brass insert ~2e7
+    k_seat = {"bare": 0.5e7, "washer": 1.5e7, "insert": 2.0e7}[d.nut_seat]
+    c["tab_nut_bedding"] = 1/k_seat
+    c["frame_nut_bedding"] = 1/k_seat
+    c["upstand_FE"] = d.upstand_fe_compliance
+    # 6 blade overhang: blade 0.25 mm thick cantilevered beyond the full-width back wall of the holder (the cutting force
+    #    pushes the blade onto this wall); width 80 mm
+    E_bl = 200e9; t_bl = 0.25e-3; w_bl = 0.080; L_ov = d.blade_support_overhang
     I_bl = w_bl*t_bl**3/12
-    # force on edge perpendicular to blade face (~ F_x * cos(clearance)) causes edge deflection along x
     c["blade_overhang"] = L_ov**3/(3*E_bl*I_bl)
-    # 7 blade clamp block (printed, 25 mm thick, compression) + stage carriage
-    c["blade_clamp_compression"] = 0.025/(fm["E"]*(0.080*0.030))
+    # 7 blade bearing on the PLA back wall (80 x 5.5 mm band, ~10 mm of PLA behind it) + holder on platform
+    c["blade_backwall_bearing"] = 0.010/(fm["E"]*(0.080*0.0055))
     # 8 cassette clamp (printed jaws, compression) + paraffin block
     c["cassette_clamp"] = 0.015/(fm["E"]*(0.040*0.010))
     # stage pitch coupling: force at height h_off above stage flexure mid-plane -> rotation -> blade x motion
@@ -199,36 +209,55 @@ def thermal_drift(d: Design, dT=1.0):
     return drift  # [m] per dT
 
 # ----------------------------------------------------------------------------- Monte Carlo error budget
-def monte_carlo(d: Design, N=20000, teeth_per_stroke=1, seed=0):
+def monte_carlo(d: Design, N=20000, teeth_per_stroke=1, seed=0, n_screws=200):
+    """Section-thickness error budget by simulation of consecutive strokes.
+    Thickness of section i = (blade position during cut i) - (blade position during cut i-1), so every error source enters
+    as a DIFFERENCE between consecutive strokes:
+      * cutting force: x_i = feed_i + C*F_i  ->  C*(F_i - F_{i-1}), s.d. sqrt(2)*C*sigma_F  (the rev. 1 model applied C*F_i only)
+      * thread lead error: a fixed function of position along each screw, evaluated where each nut sits at stroke i; the
+        model uses a cumulative (bias) term, a per-revolution periodic term and a local random term, each drawn ONCE per
+        simulated screw pair (n_screws realisations) and then walked along, so adjacent steps are correlated as on a real thread.
+    Returns mean, s.d., percentiles, contributions, and the bias distribution (mean thickness of each simulated screw pair)."""
     rng = np.random.default_rng(seed)
-    nominal = d.feed_per_tooth()*teeth_per_stroke
-    # (a) differential pitch error: rolled threads, local pitch deviation ~ 1% (1 sigma) of each pitch, uncorrelated between the two
-    pa = d.pitch_a*(1 + rng.normal(0, 0.01, N))
-    pb = d.pitch_b*(1 + rng.normal(0, 0.01, N))
-    # drunkenness (periodic within a turn): amplitude 3 um p-p per rev -> per-step derivative contribution
-    # for a step of 1/n_teeth turn, the periodic error contributes  A*2pi/n * cos(phase)
-    A_drunk = 1.5e-6
-    phase = rng.uniform(0, 2*np.pi, N)
-    e_drunk = A_drunk*(2*np.pi/d.n_teeth)*np.cos(phase)*np.sqrt(2)   # two threads
-    feed = (pa - pb)*teeth_per_stroke/d.n_teeth + e_drunk
-    # (b) ratchet tooth-pitch error (printed): 0.05 mm on a 60 mm diameter wheel -> angular error -> feed error
-    D_r = 0.060
-    tooth_angle_err = rng.normal(0, 0.05e-3/(D_r/2), N)   # rad
-    e_tooth = tooth_angle_err/(2*np.pi)*(d.pitch_a-d.pitch_b)
-    # (c) compliance x cutting force variation
+    k = teeth_per_stroke
+    step = d.feed_per_tooth()*k                       # nominal stage advance per stroke
+    per_screw = N // n_screws
+    thick = []; bias = []; e_lead_all = []
+    for sidx in range(n_screws):
+        # lead error functions for this screw pair, as a function of nut travel s (m) along each thread
+        b1 = rng.uniform(-d.lead_bias_pct, d.lead_bias_pct)/100; b2 = rng.uniform(-d.lead_bias_pct, d.lead_bias_pct)/100
+        A1 = d.lead_periodic_um*1e-6*rng.uniform(0.5, 1.0); A2 = d.lead_periodic_um*1e-6*rng.uniform(0.5, 1.0)
+        ph1, ph2 = rng.uniform(0, 2*np.pi, 2)
+        n = per_screw + 1
+        # travel of each engagement point: coarse thread advances pitch_a per rev relative to the frame nut, fine thread pitch_b
+        turns = np.arange(n)*k/d.n_teeth
+        s1 = turns*d.pitch_a; s2 = turns*d.pitch_b
+        loc1 = np.cumsum(rng.normal(0, d.lead_local_pct/100*d.pitch_a*k/d.n_teeth, n))   # local random lead walk
+        loc2 = np.cumsum(rng.normal(0, d.lead_local_pct/100*d.pitch_b*k/d.n_teeth, n))
+        e1 = b1*s1 + A1*np.sin(2*np.pi*s1/d.pitch_a + ph1) + loc1
+        e2 = b2*s2 + A2*np.sin(2*np.pi*s2/d.pitch_b + ph2) + loc2
+        x_lead = (s1 + e1) - (s2 + e2)                 # stage position from the screw train
+        e_lead = np.diff(x_lead) - step                # per-stroke lead error
+        e_lead_all.append(e_lead); bias.append(e_lead.mean())
+    e_lead = np.concatenate(e_lead_all); N = len(e_lead)
+    # ratchet tooth-pitch error (printed drum, 0.05 mm 1 s.d. on a 50 mm pitch circle) -> per-step angular error difference
+    tooth = rng.normal(0, 0.05e-3/(0.050/2), N+1)
+    e_tooth = np.diff(tooth)/(2*np.pi)*d.feed_per_rev()
+    # cutting force through the loop compliance: difference between consecutive strokes
     C_tot = sum(loop_compliance(d).values())
-    e_comp = C_tot*rng.normal(0, d.F_cut_var, N)
-    # (d) thermal drift between consecutive strokes (1 s cadence; room drift 1 K / 30 min)
-    e_th = thermal_drift(d, dT=1.0/1800)*np.ones(N)*rng.normal(1, 0.3, N)
-    # (e) pawl seating / backlash: zero with preloaded flexure stage and full tooth engagement; residual 0.1 um
+    F = rng.normal(0, d.F_cut_var, N+1)
+    e_comp = C_tot*np.diff(F)
+    # thermal drift between consecutive strokes (1 s cadence; room drift 1 K / 30 min)
+    e_th = thermal_drift(d, dT=1.0/1800)*rng.normal(1, 0.3, N)
+    # pawl seating / drum settling: residual 0.1 um
     e_pawl = rng.normal(0, 0.1e-6, N)
-    total = feed + e_tooth + e_comp + e_th + e_pawl
-    out = dict(nominal=nominal, mean=total.mean(), std=total.std(),
-               p5=np.percentile(total, 5), p95=np.percentile(total, 95),
-               contrib=dict(thread_pitch=np.std(feed), ratchet_tooth=np.std(e_tooth),
-                            compliance=np.std(e_comp), thermal=np.std(e_th), pawl=np.std(e_pawl)),
-               samples=total)
-    return out
+    total = step + e_lead + e_tooth + e_comp + e_th + e_pawl
+    bias = np.array(bias)
+    return dict(nominal=step, mean=total.mean(), std=total.std(), p5=np.percentile(total, 5), p95=np.percentile(total, 95),
+                bias_sd=bias.std(), bias_p5_pct=np.percentile(bias, 5)/step*100, bias_p95_pct=np.percentile(bias, 95)/step*100,
+                contrib=dict(thread_lead=np.std(e_lead - np.repeat(bias, per_screw)), thread_bias=bias.std(), ratchet_tooth=np.std(e_tooth),
+                             compliance=np.std(e_comp), thermal=np.std(e_th), pawl=np.std(e_pawl)),
+                samples=total)
 
 def summary(d: Design):
     piv = pivot_props(d); st = stage_props(d); lc = loop_compliance(d)

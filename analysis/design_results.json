@@ -10,7 +10,7 @@
    4.911434264214165,
    14.088565735785835
   ],
-  "loop_stiffness_N_per_um": 1.0005314715200793,
+  "loop_stiffness_N_per_um": 0.8315598437557348,
   "thermal_um_per_K": 10.549999999999999
  },
  "pivot": {
@@ -38,27 +38,33 @@
  "loop_compliance_um_per_N": {
   "arm_axial": 0.08043758043758044,
   "pivot_axial": 0.02499999999999999,
-  "frame_tower_base_FE": 0.2127,
-  "screw_axial": 0.009040754163799972,
-  "ball_contact": 0.09999999999999999,
-  "thread_nut_in_PLA": 0.19999999999999998,
+  "frame_tower_base_FE": 0.353,
+  "screw_axial": 0.006780565622849979,
+  "coupler_steel_contact": 0.02,
+  "tab_nut_bedding": 0.06666666666666667,
+  "frame_nut_bedding": 0.06666666666666667,
+  "upstand_FE": 0.185,
   "blade_overhang": 0.25000000000000006,
-  "blade_clamp_compression": 0.0029761904761904765,
+  "blade_backwall_bearing": 0.006493506493506495,
   "cassette_clamp": 0.010714285714285714,
-  "stage_pitch": 0.1086
+  "stage_pitch": 0.1318
  },
  "mc5": {
   "nominal": 5e-06,
-  "mean": 5.0055458820476405e-06,
-  "std": 5.58859572495557e-07,
-  "p5": 4.085029125490166e-06,
-  "p95": 5.9237404619666194e-06
+  "mean": 5.006805035388498e-06,
+  "std": 7.162915670366892e-07,
+  "p5": 3.8398943209381195e-06,
+  "p95": 6.185193820939819e-06,
+  "bias_sd": 2.0950389959892994e-08,
+  "bias_p5_pct": -0.7066456694120631,
+  "bias_p95_pct": 0.7169333621903765
  },
  "mc5_contrib": {
-  "thread_pitch": 3.706643650805635e-07,
-  "ratchet_tooth": 6.625515063013528e-08,
-  "compliance": 4.0045973303759864e-07,
-  "thermal": 1.765952285087318e-09,
-  "pawl": 9.996993018036342e-08
+  "thread_lead": 1.7528460487561426e-07,
+  "thread_bias": 2.0950389959892994e-08,
+  "ratchet_tooth": 1.126810929522904e-07,
+  "compliance": 6.791947978449953e-07,
+  "thermal": 1.7603966608408107e-09,
+  "pawl": 1.0057087156193042e-07
  }
 }
