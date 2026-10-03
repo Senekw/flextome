@@ -1,75 +1,126 @@
-"""Labelled assembly drawings: numbered-balloon isometric with parts legend, and annotated mechanism section."""
-import numpy as np, matplotlib.pyplot as plt, matplotlib as mpl, json
+"""Labelled assembly drawings: numbered-balloon isometric with parts legend, and annotated mechanism section.
+Balloons are placed automatically on a perimeter ring in the same angular order as their targets, so leaders do not cross."""
+import numpy as np, matplotlib.pyplot as plt, json
 import render
 parts = render.load_parts()
-meta = {m["name"]: m for m in json.load(open("parts.json"))}
 
-def balloon_fig(out, azim, elev, items, W=1800, H=1300, title=None, hide=(), section_y=None, legend_cols=2, fs=8.5):
+def ring_positions(targets, W, H, margin=0.055, cx=None, cy=None, min_sep_px=90):
+    """Balloon positions on a rectangular ring: each target is projected radially from the image centre onto the ring,
+    then neighbours are spread along the ring to a minimum spacing while keeping angular order (so leaders never cross)."""
+    t = np.asarray(targets, float)
+    cx = W/2 if cx is None else cx; cy = H/2 if cy is None else cy
+    x0, x1, y0, y1 = margin*W, (1-margin)*W, margin*H, (1-margin)*H
+    corners = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    seg_len = [x1-x0, y1-y0, x1-x0, y1-y0]; L = sum(seg_len)
+    def point_at(d):
+        d %= L
+        for (px, py), ln, k in zip(corners, seg_len, range(4)):
+            if d <= ln:
+                return (px + d, py) if k == 0 else (px, py + d) if k == 1 else (px - d, py) if k == 2 else (px, py - d)
+            d -= ln
+        return corners[0]
+    def ray_param(px, py):
+        dx, dy = px - cx, py - cy
+        if abs(dx) < 1e-9 and abs(dy) < 1e-9: dx = 1.0
+        # intersect ray with rectangle
+        cands = []
+        if dx > 0: cands.append((x1 - cx)/dx)
+        if dx < 0: cands.append((x0 - cx)/dx)
+        if dy > 0: cands.append((y1 - cy)/dy)
+        if dy < 0: cands.append((y0 - cy)/dy)
+        k = min(c for c in cands if c > 0)
+        ix, iy = cx + k*dx, cy + k*dy
+        # perimeter distance of (ix, iy), clockwise from top-left corner
+        if abs(iy - y0) < 1e-6: return ix - x0
+        if abs(ix - x1) < 1e-6: return seg_len[0] + (iy - y0)
+        if abs(iy - y1) < 1e-6: return seg_len[0] + seg_len[1] + (x1 - ix)
+        return seg_len[0] + seg_len[1] + seg_len[2] + (y1 - iy)
+    d = np.array([ray_param(px, py) for px, py in t])
+    order = np.argsort(d); ds = d[order].copy()
+    # spread: iterate a few passes of cyclic min-separation relaxation
+    n = len(ds)
+    for _ in range(50):
+        moved = False
+        for k in range(n):
+            a, b = ds[k], ds[(k+1) % n] + (L if k == n-1 else 0)
+            gap = b - a
+            if gap < min_sep_px:
+                shift = (min_sep_px - gap)/2
+                ds[k] -= shift; 
+                if k == n-1: ds[0] += shift
+                else: ds[k+1] += shift
+                moved = True
+        if not moved: break
+    out = np.empty_like(t); out[order] = np.array([point_at(v) for v in ds])
+    return out
+
+def balloon_fig(out, azim, elev, items, W=1800, H=1300, title=None, hide=(), section_y=None, legend_cols=2, fs=8.5, ring_margin=0.055, ring_center=(0.5, 0.5)):
     img, proj = render.render_cad(parts, "_tmp.png", azim=azim, elev=elev, W=W, H=H, hide=hide, section_y=section_y)
-    fig = plt.figure(figsize=(W/160, (H+330)/160), dpi=160)
-    ax = fig.add_axes([0, 330/(H+330), 1, H/(H+330)]); ax.imshow(img); ax.axis("off")
-    for k, (num, label, pt3, (fx, fy)) in enumerate(items):
-        px, py = proj(pt3)
-        tx, ty = fx*W, (1-fy)*H
-        ax.annotate("", xy=(px, py), xytext=(tx, ty), arrowprops=dict(arrowstyle="-", color="0.15", lw=0.9, shrinkA=11, shrinkB=0))
-        ax.plot(px, py, "o", ms=3, color="0.15")
+    tgt = np.array([proj(pt3) for (_, _, pt3) in items])
+    pos = ring_positions(tgt, W, H, margin=ring_margin, cx=ring_center[0]*W, cy=ring_center[1]*H)
+    LH = 36*int(np.ceil(len(items)/legend_cols)) + 60
+    fig = plt.figure(figsize=(W/160, (H+LH)/160), dpi=160)
+    ax = fig.add_axes([0, LH/(H+LH), 1, H/(H+LH)]); ax.imshow(img); ax.axis("off")
+    for (num, label, pt3), (px, py), (tx, ty) in zip(items, tgt, pos):
+        ax.annotate("", xy=(px, py), xytext=(tx, ty), arrowprops=dict(arrowstyle="-", color="0.2", lw=0.9, shrinkA=12, shrinkB=0))
+        ax.plot(px, py, "o", ms=3.2, color="0.2", mec="white", mew=0.6)
         ax.text(tx, ty, str(num), ha="center", va="center", fontsize=fs+1, weight="bold",
-                bbox=dict(boxstyle="circle,pad=0.35", fc="white", ec="0.15", lw=1.0))
-    if title: ax.text(0.01, 0.985, title, transform=ax.transAxes, fontsize=12, weight="bold", va="top")
-    # legend
-    lax = fig.add_axes([0.02, 0.0, 0.96, 330/(H+330)]); lax.axis("off")
+                bbox=dict(boxstyle="circle,pad=0.32", fc="white", ec="0.2", lw=1.0))
+    if title: ax.text(0.5, 0.995, title, transform=ax.transAxes, fontsize=12, weight="bold", va="top", ha="center")
+    lax = fig.add_axes([0.03, 0.0, 0.94, LH/(H+LH)]); lax.axis("off")
     n = len(items); rows = int(np.ceil(n/legend_cols))
-    for k, (num, label, pt3, _) in enumerate(items):
+    for k, (num, label, pt3) in enumerate(items):
         col, row = k // rows, k % rows
-        lax.text(col/legend_cols, 1 - (row+0.5)/(rows+0.5), f"{num:>2}  {label}", fontsize=fs, va="center", family="DejaVu Sans")
+        lax.text(col/legend_cols, 1 - (row+0.6)/(rows+0.6), f"{num:>2}", fontsize=fs, va="center", weight="bold")
+        lax.text(col/legend_cols + 0.02, 1 - (row+0.6)/(rows+0.6), label, fontsize=fs, va="center")
     fig.savefig(out, dpi=160); plt.close(fig)
 
 # ---------------- Figure: numbered isometric
 items_iso = [
- (1, "Frame: ribbed base 235x150x55, gusseted tower (one print)", (-30, -40, 60), (0.07, 0.62)),
- (2, "Cross-strip flexure pivot: 3 x 0.20 mm spring-steel strips + clamp pads", (0, -20, 95), (0.08, 0.88)),
- (3, "Rocking arm: tapered hollow box beam, 125 mm pivot-to-face", (55, -22, 108), (0.27, 0.96)),
- (4, "Cassette clamp: lower lip, sliding jaw, M5 thumbscrew", (117, -22, 118), (0.46, 0.99)),
- (5, "Histology cassette + paraffin block (consumable)", (122, -14, 95), (0.50, 0.83)),
- (6, "Disposable low-profile blade (80x8x0.25), 27 deg lean", (126, -28, 95), (0.60, 0.93)),
- (7, "Steel pressure strip 1.0 mm + blade holder, 2 x M4 grub screws", (140, -42, 90), (0.57, 0.66)),
- (8, "Parallelogram flexure stage (monolithic print): plates 1.0x44 mm", (137, -32, 60), (0.57, 0.45)),
- (9, "Stage clamp knobs M6 (coarse approach slots +/-10 mm)", (161, -35, 46), (0.60, 0.30)),
- (10, "Coarse-approach screw M6 (side boss)", (215, -54, 34), (0.78, 0.22)),
- (11, "Differential feed screw: M8x1.0 bolt / coupler / M8x1.25 rod", (160, 0, 70), (0.70, 0.60)),
- (12, "Ratchet drum 50 T x 14 mm (5 um per tooth) + jam nuts", (205, 0, 45), (0.80, 0.42)),
- (13, "Thickness-selector shield (1-6 teeth = 5-30 um)", (205, 28, 92), (0.86, 0.55)),
- (14, "Feed knob", (219, 0, 70), (0.90, 0.33)),
- (15, "Pawl rod with finger; lifted by striker bar at top of stroke", (200, 66, 140), (0.90, 0.86)),
- (16, "Striker bar on arm (feed actuation)", (150, 51, 116), (0.72, 0.95)),
- (17, "Connecting rod (fork) and crank disc, r = 13 mm", (60, -23, 80), (0.32, 0.50)),
- (18, "Crankshaft 8 mm in 2 x 608 bearings, pillow blocks", (60, -50, 25), (0.25, 0.28)),
- (19, "Handwheel 110 mm with handle (one turn = one section)", (60, 101, 25), (0.46, 0.14)),
- (20, "M8 tie rods (base pre-compression / split-base option)", (195, -55, -45), (0.84, 0.10)),
+ (1, "Frame: ribbed base 235 × 150 × 55 mm, gusseted tower (one print)", (-30, -40, 60)),
+ (2, "Cross-strip flexure pivot: 3 × 0.20 mm spring-steel strips in clamp pads", (0, -20, 95)),
+ (3, "Rocking arm: tapered hollow box beam, 125 mm pivot to face", (55, -22, 108)),
+ (4, "Cassette clamp: lower lip, sliding jaw, M5 thumbscrew", (117, -22, 118)),
+ (5, "Histology cassette and paraffin block (consumable)", (122, -14, 95)),
+ (6, "Disposable low-profile blade 80 × 8 × 0.25 mm, 27° lean", (126, -28, 95)),
+ (7, "Steel pressure strip 1.0 mm on blade holder, 2 × M4 grub screws", (140, -42, 90)),
+ (8, "Parallelogram flexure stage (monolithic print), plates 1.0 × 44 mm", (137, -32, 60)),
+ (9, "Stage clamp knobs M6 (coarse-approach slots ±10 mm)", (161, -35, 46)),
+ (10, "Coarse-approach screw M6 in side boss", (215, -54, 34)),
+ (11, "Differential feed screw: M8×1.0 bolt, coupler, M8×1.25 rod", (160, 0, 70)),
+ (12, "Ratchet drum 50 T × 14 mm (5 µm per tooth) with jam nuts", (205, 0, 45)),
+ (13, "Thickness-selector shield (1 to 6 teeth = 5 to 30 µm)", (205, 28, 92)),
+ (14, "Feed knob", (219, 0, 70)),
+ (15, "Pawl rod with finger, lifted by the striker bar at top of stroke", (200, 66, 140)),
+ (16, "Striker bar on arm (feed actuation)", (150, 51, 116)),
+ (17, "Fork connecting rod 71.2 mm and crank webs, r = 13 mm", (60, -23, 80)),
+ (18, "Built-up crankshaft 8 mm in 2 × 608 bearings, pillow blocks", (60, -50, 25)),
+ (19, "Handwheel 110 mm with handle (one turn = one section)", (60, 101, 25)),
+ (20, "M8 tie rods (base pre-compression, split-base option)", (195, -55, -45)),
 ]
-balloon_fig("fig_assembly_callouts.png", -55, 25, items_iso, title="FlexTome assembly - numbered components")
+balloon_fig("fig_assembly_callouts.png", -55, 25, items_iso, title="FlexTome assembly: numbered components")
 
 # ---------------- Figure: annotated section (y = 0 cut, viewed from +y)
 items_sec = [
- (1, "Gusseted tower: 60 mm root depth, FE compliance 0.21 um/N", (-20, 0, 40), (0.93, 0.45)),
- (2, "Cross-strip pivot (X): rotation about the strip crossing; zero backlash", (0, 0, 95), (0.93, 0.82)),
- (3, "Arm root clamp pads (M3) + hollow box beam", (40, 0, 95), (0.72, 0.96)),
- (4, "Conrod joint at r = 60 mm; crank pin r = 13 mm -> theta = +/-12.5 deg", (60, 0, 95), (0.58, 0.96)),
- (5, "Crank webs (pin between them) / shaft axis z = 23.8", (60, 0, 25), (0.64, 0.16)),
- (6, "Cassette + block; face on 125 mm arc, 54 mm stroke", (122, 0, 95), (0.44, 0.96)),
- (7, "Blade edge at (126, 95): lean 27 deg, clearance 9.5 deg, rake 45.5 deg", (126, 0, 95), (0.35, 0.92)),
- (8, "Pressure strip top 2.5 mm below edge; outside the swept circle", (127.3, 0, 92), (0.19, 0.86)),
- (9, "Platform + blade holder (2 x M4 grub screws from rear)", (150, 0, 90), (0.31, 0.95)),
- (10, "Front flexure plate 1.0 x 44 mm (60 wide)", (137.5, 0, 58), (0.42, 0.42)),
- (11, "Rear flexure plates 2 x 20 wide", (180.5, 0, 58), (0.17, 0.21)),
- (12, "Stage tab with M8x1.0 nut (moves +/-1 mm)", (155, 0, 65), (0.47, 0.66)),
- (13, "Coupler (bolt head pocket + jam nut) - translates +/-5 mm", (175, 0, 70), (0.03, 0.62)),
- (14, "Frame nut M8x1.25 in fixed upstand", (189, 0, 70), (0.03, 0.72)),
- (15, "Ratchet drum 14 mm long: pawl stays engaged over screw travel", (205, 0, 70), (0.06, 0.90)),
- (16, "Feed knob", (219, 0, 70), (0.03, 0.50)),
- (17, "Rib pockets (open underside) + M8 tie rod at z = -45", (100, 0, -30), (0.50, 0.05)),
- (18, "Raised deck (z = 30): stage clamp slots, coarse approach", (160, 0, 30), (0.25, 0.09)),
+ (1, "Gusseted tower: 60 mm root depth, FE compliance 0.21 µm/N", (-20, 0, 40)),
+ (2, "Cross-strip pivot: rotation about the strip crossing, zero backlash", (0, 0, 95)),
+ (3, "Arm root clamp pads (M3) and hollow box beam", (40, 0, 95)),
+ (4, "Connecting-rod joint at r = 60 mm; crank pin r = 13 mm gives θ = ±12.5°", (60, 0, 95)),
+ (5, "Crank webs (pin between them), shaft axis z = 23.8 mm", (60, 0, 25)),
+ (6, "Cassette and block: face on 125 mm arc, 54 mm stroke", (122, 0, 95)),
+ (7, "Blade edge at (126, 95): lean 27°, clearance 9.5°, rake 45.5°", (126, 0, 95)),
+ (8, "Pressure strip top 2.5 mm below the edge, outside the swept circle", (127.3, 0, 92)),
+ (9, "Platform and blade holder (2 × M4 grub screws from the rear)", (150, 0, 90)),
+ (10, "Front flexure plate 1.0 × 44 mm (60 mm wide)", (137.5, 0, 58)),
+ (11, "Rear flexure plates 2 × 20 mm wide", (180.5, 0, 58)),
+ (12, "Stage tab with M8×1.0 nut (moves ±1 mm)", (155, 0, 65)),
+ (13, "Coupler (bolt-head pocket and jam nut), translates ±5 mm", (175, 0, 70)),
+ (14, "Frame nut M8×1.25 in fixed upstand", (189, 0, 70)),
+ (15, "Ratchet drum 14 mm long: pawl stays engaged over screw travel", (205, 0, 70)),
+ (16, "Feed knob", (219, 0, 70)),
+ (17, "Rib pockets (open underside) and M8 tie rod at z = −45 mm", (100, 0, -30)),
+ (18, "Raised deck (z = 30 mm): stage clamp slots, coarse approach", (160, 0, 30)),
 ]
 balloon_fig("fig_section_callouts.png", 90, 0, items_sec, W=1800, H=1200, section_y=0.5, hide=("handwheel", "handle"),
-            title="Mechanism section at y = 0 (viewed from +y)")
+            title="Mechanism section at y = 0 (viewed from +y)", ring_center=(0.33, 0.42))
 print("drawings done")
