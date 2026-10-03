@@ -1,0 +1,386 @@
+[
+ {
+  "name": "frame",
+  "color": [
+   0.82,
+   0.82,
+   0.84
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 983.42
+ },
+ {
+  "name": "pivot_strips_steel",
+  "color": [
+   0.35,
+   0.38,
+   0.45
+  ],
+  "material": "spring steel feeler gauge 0.20 mm",
+  "qty": 3,
+  "printed": false,
+  "volume_cm3": 0.26
+ },
+ {
+  "name": "pivot_clamp_plates_frame",
+  "color": [
+   0.25,
+   0.25,
+   0.28
+  ],
+  "material": "PLA (FDM) + M3 screws",
+  "qty": 3,
+  "printed": true,
+  "volume_cm3": 0.8
+ },
+ {
+  "name": "pivot_clamp_plates_arm",
+  "color": [
+   0.25,
+   0.25,
+   0.28
+  ],
+  "material": "PLA (FDM) + M3 screws",
+  "qty": 3,
+  "printed": true,
+  "volume_cm3": 0.8
+ },
+ {
+  "name": "arm",
+  "color": [
+   0.92,
+   0.55,
+   0.15
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 103.94
+ },
+ {
+  "name": "cassette_upper_jaw",
+  "color": [
+   0.92,
+   0.55,
+   0.15
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 3.28
+ },
+ {
+  "name": "cassette_thumbscrew",
+  "color": [
+   0.2,
+   0.2,
+   0.22
+  ],
+  "material": "M5 thumbscrew",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 1.22
+ },
+ {
+  "name": "histology_cassette",
+  "color": [
+   0.95,
+   0.95,
+   0.97
+  ],
+  "material": "standard cassette (consumable)",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 7.62
+ },
+ {
+  "name": "paraffin_block",
+  "color": [
+   0.98,
+   0.92,
+   0.75
+  ],
+  "material": "paraffin specimen block",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 2.1
+ },
+ {
+  "name": "conrod",
+  "color": [
+   0.2,
+   0.55,
+   0.85
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 12.67
+ },
+ {
+  "name": "crankshaft",
+  "color": [
+   0.55,
+   0.55,
+   0.6
+  ],
+  "material": "8 mm steel shaft",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 8.39
+ },
+ {
+  "name": "crank_disc",
+  "color": [
+   0.2,
+   0.55,
+   0.85
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 23.48
+ },
+ {
+  "name": "crank_pin",
+  "color": [
+   0.3,
+   0.3,
+   0.33
+  ],
+  "material": "M5 shoulder bolt",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 0.55
+ },
+ {
+  "name": "bearings_608",
+  "color": [
+   0.45,
+   0.45,
+   0.5
+  ],
+  "material": "608ZZ ball bearing",
+  "qty": 2,
+  "printed": false,
+  "volume_cm3": 4.62
+ },
+ {
+  "name": "handwheel",
+  "color": [
+   0.2,
+   0.55,
+   0.85
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 57.17
+ },
+ {
+  "name": "handle",
+  "color": [
+   0.15,
+   0.15,
+   0.17
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 5.78
+ },
+ {
+  "name": "stage_body_flexure",
+  "color": [
+   0.35,
+   0.75,
+   0.45
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 108.03
+ },
+ {
+  "name": "blade_holder",
+  "color": [
+   0.25,
+   0.6,
+   0.35
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 11.3
+ },
+ {
+  "name": "pressure_strip_steel",
+  "color": [
+   0.6,
+   0.6,
+   0.66
+  ],
+  "material": "1.0 mm steel feeler-gauge strip 84x11",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 0.92
+ },
+ {
+  "name": "blade_grub_screws_M4",
+  "color": [
+   0.2,
+   0.2,
+   0.22
+  ],
+  "material": "M4 grub screw x2",
+  "qty": 2,
+  "printed": false,
+  "volume_cm3": 0.78
+ },
+ {
+  "name": "blade_low_profile",
+  "color": [
+   0.9,
+   0.9,
+   0.95
+  ],
+  "material": "disposable low-profile microtome blade 80x8x0.25",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 0.16
+ },
+ {
+  "name": "feed_screw_M8x1_25",
+  "color": [
+   0.5,
+   0.5,
+   0.55
+  ],
+  "material": "M8x1.25 threaded rod 50 mm",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 2.31
+ },
+ {
+  "name": "feed_screw_M8x1_0",
+  "color": [
+   0.6,
+   0.6,
+   0.65
+  ],
+  "material": "M8x1.0 fine bolt 30 mm",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 1.41
+ },
+ {
+  "name": "screw_coupler",
+  "color": [
+   0.85,
+   0.25,
+   0.25
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 0.7
+ },
+ {
+  "name": "ratchet_wheel_50T",
+  "color": [
+   0.85,
+   0.25,
+   0.25
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 22.9
+ },
+ {
+  "name": "thickness_selector_shield",
+  "color": [
+   0.95,
+   0.75,
+   0.2
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 6.32
+ },
+ {
+  "name": "feed_knob",
+  "color": [
+   0.85,
+   0.25,
+   0.25
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 4.9
+ },
+ {
+  "name": "pawl_rod",
+  "color": [
+   0.85,
+   0.25,
+   0.25
+  ],
+  "material": "PLA (FDM)",
+  "qty": 1,
+  "printed": true,
+  "volume_cm3": 9.64
+ },
+ {
+  "name": "stage_clamp_knobs_M6",
+  "color": [
+   0.2,
+   0.2,
+   0.22
+  ],
+  "material": "M6 knob bolt + heat-set insert",
+  "qty": 2,
+  "printed": false,
+  "volume_cm3": 6.04
+ },
+ {
+  "name": "fastener_heads_M3_M4",
+  "color": [
+   0.25,
+   0.25,
+   0.28
+  ],
+  "material": "M4 x 12 socket screws x8 (visual)",
+  "qty": 8,
+  "printed": false,
+  "volume_cm3": 0.7
+ },
+ {
+  "name": "tie_rods_M8_steel_spine",
+  "color": [
+   0.5,
+   0.5,
+   0.55
+  ],
+  "material": "M8x250 threaded rod + 4 nuts (base spine)",
+  "qty": 2,
+  "printed": false,
+  "volume_cm3": 27.7
+ },
+ {
+  "name": "coarse_approach_screw_M6",
+  "color": [
+   0.2,
+   0.2,
+   0.22
+  ],
+  "material": "M6 x 40 bolt + knob",
+  "qty": 1,
+  "printed": false,
+  "volume_cm3": 3.39
+ }
+]

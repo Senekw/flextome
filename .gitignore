@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+*.aux
+*.log
+*.bbl
+*.blg
+*.out
+tectonic_cache/
+texbundle/
