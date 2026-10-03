@@ -12,7 +12,7 @@ Companion to the paper (Section "Mechanism walkthrough"). Coordinates: *x* = fee
 - Crank centre C = (60, 23.8) is exactly one rod length ℓ = 71.2 mm below the arm joint A (60 mm from the pivot), so the swing is symmetric:
   `sin θmax = r / r_con = 13/60 → θ = ±12.5°`, stroke `s = 2·125·sin θmax = 54.2 mm`.
 - Loop closure `|A(θ) − B(φ)| = ℓ` gives θ(φ) (fig M1b). Arm horizontal at φ₀ = asin(r/2ℓ) = 5.2° (CAD rest pose).
-- At 60 rpm the face crosses the edge at 153–174 mm/s; a 20 mm face is cut in 118 ms (excitation < 9 Hz, first structural mode 357 Hz).
+- The machine is hand-driven; 60 rpm (one section per second) is the reference rate used for all speed-dependent numbers, and the build-and-measure plan records the real handwheel rate and measures cutting force at that speed. At 60 rpm the face crosses the edge at 153–174 mm/s; a 20 mm face is cut in 118 ms (excitation < 9 Hz, first structural mode 357 Hz).
 - Handwheel effort is dominated by the cut itself: pivot torque 0.058 N·m → ~0.013 N·m at the shaft (0.23 N at the handle).
 
 ![Kinematics](figM1_kinematics.png)

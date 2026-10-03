@@ -88,7 +88,7 @@ def balloon_fig(out, azim, elev, items, W=1800, H=1300, title=None, hide=(), sec
     lax = fig.add_axes([0.03, 0.0, 0.94, LH/TOT]); lax.axis("off")
     for k, (num, label, pt3) in enumerate(items):
         col, row = k // rows, k % rows
-        lax.text(col/legend_cols, 1 - (row+0.6)/(rows+0.6), f"{num:>2}", fontsize=fs, va="center", weight="bold")
+        lax.text(col/legend_cols, 1 - (row+0.6)/(rows+0.6), f"{str(num):>3}", fontsize=fs, va="center", weight="bold")
         lax.text(col/legend_cols + 0.025, 1 - (row+0.6)/(rows+0.6), label, fontsize=fs, va="center")
     fig.savefig(out, dpi=160); plt.close(fig)
 
@@ -121,27 +121,27 @@ balloon_fig("fig_assembly_callouts.png", -55, 25, items_iso, title="FlexTome ass
 
 # ---------------- Figure: annotated section (y = 0 cut, viewed from +y)
 items_sec = [
- (1, "Gusseted tower: 60 mm root depth, FE compliance 0.21 µm/N", (-20, 0, 40)),
- (2, "Cross-strip pivot: rotation about the strip crossing, zero backlash", (0, 0, 95)),
- (3, "Arm root clamp pads (M3) and hollow box beam", (40, 0, 95)),
- (4, "Rod joint at r = 60 mm; crank pin r = 13 mm gives θ = ±12.5°", (60, 0, 95)),
- (5, "Crank webs (pin between them), shaft axis z = 23.8 mm", (60, 0, 25)),
- (6, "Cassette and block: face on 125 mm arc, 54 mm stroke", (122, 0, 95)),
- (7, "Blade edge at (126, 95): lean 27°, clearance 9.5°, rake 45.5°", (126, 0, 95)),
- (8, "Clamp strip top 2.5 mm below the edge, outside the swept circle", (127.3, 0, 92)),
- (9, "Blade holder: full-width back wall carries the cutting force", (150, 0, 86)),
- (10, "Front flexure plate 1.0 × 44 mm (60 mm wide)", (137.5, 0, 50)),
- (11, "Rear flexure plates 2 × 20 mm wide", (180.5, 0, 50)),
- (12, "Gusseted stage tab, M8×1.0 nut on washer (moves ±1 mm)", (155, 0, 55)),
- (13, "Coupler: bolt head in pocket, rod end bears on it; travels ±5 mm", (171, 0, 60)),
- (14, "Frame nut M8×1.25 on washer in gusseted upstand (FE 0.19 µm/N)", (189, 0, 60)),
- (15, "Ratchet drum 14 mm long: pawl stays engaged over screw travel", (208, 0, 60)),
- (16, "Feed knob", (222, 0, 60)),
- (17, "Rib pockets (open underside) and M8 tie rod at z = −45 mm", (100, 0, -30)),
- (18, "Raised deck (z = 22 mm): stage clamp slots and coarse approach", (160, 0, 22)),
+ ("1",   "Frame tower: 60 mm root depth, FE compliance 0.21 µm/N", (-20, 0, 40)),
+ ("2",   "Cross-strip pivot: rotates about the strip crossing, zero backlash", (0, 0, 95)),
+ ("3",   "Arm: root clamp pads (M3) and hollow box beam", (40, 0, 95)),
+ ("17",  "Connecting rod: joint at r = 60 mm; crank r = 13 mm gives ±12.5°", (60, 0, 95)),
+ ("18",  "Crankshaft: two webs with pin between, axis at z = 23.8 mm", (60, 0, 25)),
+ ("5",   "Cassette and block: face on 125 mm arc, 54 mm stroke", (122, 0, 95)),
+ ("6",   "Blade: edge at (126, 95), lean 27°, clearance 9.5°, rake 45.5°", (126, 0, 95)),
+ ("7a",  "Clamp strip (part of 7): top 2.5 mm below the edge", (127.3, 0, 92)),
+ ("7b",  "Holder back wall (part of 7): carries the cutting force", (150, 0, 86)),
+ ("8a",  "Stage front plate (part of 8): 1.0 × 44 mm, 60 mm wide", (137.5, 0, 50)),
+ ("8b",  "Stage rear plates (part of 8): 2 × 20 mm wide", (180.5, 0, 50)),
+ ("8c",  "Stage tab (part of 8): M8×1.0 nut on washer, moves ±1 mm", (155, 0, 55)),
+ ("11a", "Coupler (part of 11): rod end bears on bolt head; ±5 mm", (171, 0, 60)),
+ ("1a",  "Upstand (part of 1): frame nut on washer, FE 0.19 µm/N", (189, 0, 60)),
+ ("12",  "Ratchet drum: 14 mm long, pawl engaged over screw travel", (208, 0, 60)),
+ ("14",  "Feed knob", (222, 0, 60)),
+ ("1b",  "Base rib pockets (part of 1), M8 tie rod (20) at z = −45 mm", (100, 0, -30)),
+ ("1c",  "Raised deck (part of 1, z = 22 mm): clamp slots, coarse approach", (160, 0, 22)),
 ]
 balloon_fig("fig_section_callouts.png", 90, 0, items_sec, W=1800, H=1200, section_y=0.5, hide=("handwheel", "handle"),
             title="Mechanism section at y = 0 (viewed from +y)", ring_center=(0.33, 0.42),
-            insets=[("cross-strip pivot (2, 3)", (1150, 150, 1450, 400)), ("blade, strip and holder (7 to 9)", (520, 180, 760, 380)),
-                    ("feed train (11 to 16)", (110, 300, 620, 680))])
+            insets=[("cross-strip pivot (2, 3)", (1150, 150, 1450, 400)), ("blade, strip and holder (6, 7a, 7b)", (520, 180, 760, 380)),
+                    ("feed train (8c, 11a, 1a, 12, 14)", (110, 300, 620, 680))])
 print("drawings done")
